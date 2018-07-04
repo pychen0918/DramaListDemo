@@ -10,7 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.pychen0918.dramalistdemo.R;
-import com.pychen0918.dramalistdemo.model.gson.DramaData;
+import com.pychen0918.dramalistdemo.model.data.Drama;
 import com.pychen0918.dramalistdemo.view.adapter.DramaListRecyclerViewAdapter;
 import com.pychen0918.dramalistdemo.viewmodel.DramaListViewModel;
 
@@ -27,9 +27,9 @@ public class MainActivity extends AppCompatActivity {
 
         String pathId = this.getString(R.string.data_source_path);
         DramaListViewModel dramaListViewModel = ViewModelProviders.of(this).get(DramaListViewModel.class);
-        dramaListViewModel.getDramaList(pathId).observe(this, new Observer<List<DramaData>>() {
+        dramaListViewModel.getDramaList(pathId).observe(this, new Observer<List<Drama>>() {
             @Override
-            public void onChanged(@Nullable List<DramaData> dramaData) {
+            public void onChanged(@Nullable List<Drama> dramaData) {
                 if(dramaData != null && mDramaListRecyclerViewAdapter != null){
                     mDramaListRecyclerViewAdapter.update(dramaData);
                 }
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView dramaListRecyclerView = findViewById(R.id.drama_list_recycler_view);
         dramaListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         dramaListRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        mDramaListRecyclerViewAdapter = new DramaListRecyclerViewAdapter(new ArrayList<DramaData>());
+        mDramaListRecyclerViewAdapter = new DramaListRecyclerViewAdapter(new ArrayList<Drama>());
         dramaListRecyclerView.setAdapter(mDramaListRecyclerViewAdapter);
     }
 }

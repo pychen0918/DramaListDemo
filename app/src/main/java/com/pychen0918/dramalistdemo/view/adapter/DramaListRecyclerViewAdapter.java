@@ -2,7 +2,6 @@ package com.pychen0918.dramalistdemo.view.adapter;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,19 +11,14 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.pychen0918.dramalistdemo.R;
-import com.pychen0918.dramalistdemo.model.gson.DramaData;
+import com.pychen0918.dramalistdemo.model.data.Drama;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaListRecyclerViewAdapter.ViewHolder>{
-    private List<DramaData> mDramaList;
-    private final SimpleDateFormat originFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
-    private final SimpleDateFormat targetFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault());
+    private List<Drama> mDramaList;
 
-    public DramaListRecyclerViewAdapter(@NonNull List<DramaData> dramaList) {
+    public DramaListRecyclerViewAdapter(@NonNull List<Drama> dramaList) {
         this.mDramaList = dramaList;
     }
 
@@ -36,22 +30,15 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DramaData item = mDramaList.get(position);
+        Drama item = mDramaList.get(position);
         if(item != null){
             holder.itemView.setTag(item.getDramaId());
 
             Glide.with(holder.itemView.getContext()).load(item.getThumb()).into(holder.thumb);
             holder.name.setText(item.getName());
-            holder.ratingText.setText(String.format(Locale.getDefault(), "%.1f", item.getRating()));
+            holder.ratingText.setText(item.getDisplayRating());
             holder.ratingBar.setRating(item.getRating());
-            String dateString = "";
-            try {
-                dateString = targetFormat.format(originFormat.parse(item.getCreatedAt()));
-            } catch (ParseException e) {
-                Log.e("DramaListAdapter", "Unable to parse created time: "+item.getCreatedAt());
-                e.printStackTrace();
-            }
-            holder.createdTime.setText(dateString);
+            holder.createdTime.setText(item.getDisplayCreatedTime());
         }
     }
 
@@ -60,9 +47,9 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
         return mDramaList.size();
     }
 
-    public void update(List<DramaData> dramaData) {
+    public void update(List<Drama> dramaList) {
         // TODO: rewrite with DiffUtil
-        this.mDramaList = dramaData;
+        this.mDramaList = dramaList;
         notifyDataSetChanged();
     }
 
