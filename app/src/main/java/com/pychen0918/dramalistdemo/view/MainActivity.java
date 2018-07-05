@@ -25,9 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private final static String TAG_SEARCH_QUERY = "search_query";
     private DramaListRecyclerViewAdapter mDramaListRecyclerViewAdapter;
     private SearchView mSearchView;
     private MenuItem mSearchViewMenuItem;
+    private String mSearchQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,18 @@ public class MainActivity extends AppCompatActivity {
         dramaListRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mDramaListRecyclerViewAdapter = new DramaListRecyclerViewAdapter(new ArrayList<Drama>());
         dramaListRecyclerView.setAdapter(mDramaListRecyclerViewAdapter);
+
+        // Load query string from save instance for configuration change
+        if(savedInstanceState != null){
+            mSearchQuery = savedInstanceState.getString(TAG_SEARCH_QUERY);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // Save query string into save instance for configuration change
+        outState.putString(TAG_SEARCH_QUERY, mSearchView.getQuery().toString());
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -73,6 +87,13 @@ public class MainActivity extends AppCompatActivity {
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setMaxWidth(Integer.MAX_VALUE);
 
+        if(mSearchQuery != null && !mSearchQuery.isEmpty()){
+            mSearchViewMenuItem.expandActionView();
+            mSearchView.setQuery(mSearchQuery, false);
+            mSearchView.clearFocus();
+            mDramaListRecyclerViewAdapter.getFilter().filter(mSearchQuery);
+        }
+
         // Search text changes
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -82,13 +103,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-                mDramaListRecyclerViewAdapter.getFilter().filter(newText);
+            public boolean onQueryTextChange(String query) {
+                mDramaListRecyclerViewAdapter.getFilter().filter(query);
                 return false;
             }
         });
 
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override

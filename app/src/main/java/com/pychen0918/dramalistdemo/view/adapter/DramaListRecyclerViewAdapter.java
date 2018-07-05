@@ -22,10 +22,12 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
         implements Filterable{
     private List<Drama> mDramaList;
     private List<Drama> mDramaListFiltered;
+    private String mFilterQuery;
 
     public DramaListRecyclerViewAdapter(@NonNull List<Drama> dramaList) {
         this.mDramaList = dramaList;
         this.mDramaListFiltered = dramaList;
+        this.mFilterQuery = "";
     }
 
     @NonNull
@@ -55,10 +57,8 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
 
     public void update(List<Drama> dramaList) {
         // TODO: rewrite with DiffUtil
-        // TODO: reapply the filter
         this.mDramaList = dramaList;
-        this.mDramaListFiltered = dramaList;
-        notifyDataSetChanged();
+        getFilter().filter(mFilterQuery);
     }
 
     @Override
@@ -71,6 +71,7 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
                     mDramaListFiltered = mDramaList;
                 }
                 else{
+                    mFilterQuery = string;
                     List<Drama> list = new ArrayList<>();
                     for(Drama item : mDramaList){
                         if(item.getName().toLowerCase().contains(string.toLowerCase())) {
