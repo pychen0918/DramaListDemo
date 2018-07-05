@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private DramaListRecyclerViewAdapter mDramaListRecyclerViewAdapter;
     private SearchView mSearchView;
     private MenuItem mSearchViewMenuItem;
-    private String mSearchQuery;
+    private String mSearchQuery = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(@Nullable List<Drama> dramaData) {
                 if(dramaData != null && mDramaListRecyclerViewAdapter != null){
                     mDramaListRecyclerViewAdapter.update(dramaData);
+                    mDramaListRecyclerViewAdapter.getFilter().filter(mSearchQuery);
                 }
             }
         });
