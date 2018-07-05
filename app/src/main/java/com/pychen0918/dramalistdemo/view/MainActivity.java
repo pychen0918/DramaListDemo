@@ -1,13 +1,20 @@
 package com.pychen0918.dramalistdemo.view;
 
+import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.pychen0918.dramalistdemo.R;
 import com.pychen0918.dramalistdemo.model.data.Drama;
@@ -19,12 +26,23 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private DramaListRecyclerViewAdapter mDramaListRecyclerViewAdapter;
+    private SearchView mSearchView;
+    private MenuItem mSearchViewMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initial Toolbar
+        Toolbar toolbar = findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar!=null) {
+            getSupportActionBar().setTitle(R.string.title_main);
+        }
+
+        // Initial ViewModel, and start to observe drama list changes
         String pathId = this.getString(R.string.data_source_path);
         DramaListViewModel dramaListViewModel = ViewModelProviders.of(this).get(DramaListViewModel.class);
         dramaListViewModel.getDramaList(pathId).observe(this, new Observer<List<Drama>>() {
@@ -36,10 +54,62 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // Initial recyclerview and adapter
         RecyclerView dramaListRecyclerView = findViewById(R.id.drama_list_recycler_view);
         dramaListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         dramaListRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mDramaListRecyclerViewAdapter = new DramaListRecyclerViewAdapter(new ArrayList<Drama>());
         dramaListRecyclerView.setAdapter(mDramaListRecyclerViewAdapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        // Searchable configuration
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearchViewMenuItem = menu.findItem(R.id.action_search_filter);
+        mSearchView = (SearchView) mSearchViewMenuItem.getActionView();
+        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        mSearchView.setMaxWidth(Integer.MAX_VALUE);
+
+        // Search text changes
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mSearchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mDramaListRecyclerViewAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_search_filter:
+                return true;
+        }
+
+        // The home click event
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(mSearchView!=null && !mSearchView.isIconified()){
+            if(mSearchViewMenuItem!=null)
+                mSearchViewMenuItem.collapseActionView();
+            return;
+        }
+
+        super.onBackPressed();
     }
 }
