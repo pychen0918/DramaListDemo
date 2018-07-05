@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private SearchView mSearchView;
     private MenuItem mSearchViewMenuItem;
     private String mSearchQuery = "";
+    private SharedPreferences mSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +66,14 @@ public class MainActivity extends AppCompatActivity {
         mDramaListRecyclerViewAdapter = new DramaListRecyclerViewAdapter(new ArrayList<Drama>());
         dramaListRecyclerView.setAdapter(mDramaListRecyclerViewAdapter);
 
+        mSharedPreferences = getSharedPreferences("drama_list_demo_pref", MODE_PRIVATE);
+
         // Load query string from save instance for configuration change
         if(savedInstanceState != null){
             mSearchQuery = savedInstanceState.getString(TAG_SEARCH_QUERY);
+        }
+        else {
+            mSearchQuery = mSharedPreferences.getString("query", "");
         }
     }
 
@@ -75,6 +82,12 @@ public class MainActivity extends AppCompatActivity {
         // Save query string into save instance for configuration change
         outState.putString(TAG_SEARCH_QUERY, mSearchView.getQuery().toString());
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mSharedPreferences.edit().putString("query", mSearchQuery).apply();
     }
 
     @Override
