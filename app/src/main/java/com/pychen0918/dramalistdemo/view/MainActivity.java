@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.pychen0918.dramalistdemo.R;
 import com.pychen0918.dramalistdemo.model.data.Drama;
@@ -64,6 +66,16 @@ public class MainActivity extends AppCompatActivity {
         dramaListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         dramaListRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         mDramaListRecyclerViewAdapter = new DramaListRecyclerViewAdapter(new ArrayList<Drama>());
+        mDramaListRecyclerViewAdapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int dramaId = (int) view.getTag();
+                Intent intent = new Intent();
+                intent.setClass(MainActivity.this, DetailActivity.class);
+                intent.putExtra("id", dramaId);
+                startActivity(intent);
+            }
+        });
         dramaListRecyclerView.setAdapter(mDramaListRecyclerViewAdapter);
 
         mSharedPreferences = getSharedPreferences("drama_list_demo_pref", MODE_PRIVATE);

@@ -89,6 +89,31 @@ public class DataRepository {
         return mDramaDao.getAll();
     }
 
+    public LiveData<Drama> getDrama(final String pathId, final Integer id) {
+        mDramaWebApi.getDramaList(pathId).enqueue(new Callback<DramaDataContainer>() {
+            @Override
+            public void onResponse(@NonNull Call<DramaDataContainer> call, @NonNull Response<DramaDataContainer> response) {
+                DramaDataContainer data = response.body();
+                if(data!=null){
+                    List<DramaData> dramaDataList = data.getData();
+                    List<Drama> dramaList = new ArrayList<>();
+                    for(DramaData item : dramaDataList){
+                        dramaList.add(new Drama(item));
+                    }
+                    insertDramaData(dramaList);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<DramaDataContainer> call, @NonNull Throwable t) {
+                Log.e("DataRepository", "Fail to get drama list: " + t.getMessage());
+                t.printStackTrace();
+            }
+        });
+
+        return mDramaDao.get(id);
+    }
+
     private void insertDramaData(final List<Drama> dramaList){
         mExecutor.execute(new Runnable() {
             @Override

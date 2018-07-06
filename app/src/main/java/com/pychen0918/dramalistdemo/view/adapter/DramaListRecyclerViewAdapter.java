@@ -22,6 +22,7 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
         implements Filterable{
     private List<Drama> mDramaList;
     private List<Drama> mDramaListFiltered;
+    private View.OnClickListener mOnClickListener;
 
     public DramaListRecyclerViewAdapter(@NonNull List<Drama> dramaList) {
         this.mDramaList = dramaList;
@@ -38,6 +39,9 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Drama item = mDramaListFiltered.get(position);
         if(item != null){
+            if(mOnClickListener!=null){
+                holder.itemView.setOnClickListener(mOnClickListener);
+            }
             holder.itemView.setTag(item.getDramaId());
 
             Glide.with(holder.itemView.getContext()).load(item.getThumb()).into(holder.thumb);
@@ -57,6 +61,10 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
         // TODO: rewrite with DiffUtil
         this.mDramaList = dramaList;
         this.mDramaListFiltered = dramaList;
+    }
+
+    public void setOnClickListener(View.OnClickListener listener){
+        this.mOnClickListener = listener;
     }
 
     @Override

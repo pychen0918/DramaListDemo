@@ -17,4 +17,7 @@ public interface DramaDao {
 
     @Query("SELECT * FROM drama")
     LiveData<List<Drama>> getAll();
+
+    @Query("SELECT * FROM drama WHERE id = :id")
+    LiveData<Drama> get(int id);
 }
