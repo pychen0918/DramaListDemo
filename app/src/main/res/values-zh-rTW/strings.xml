@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">戲劇列表App</string>
+    <string name="action_search">搜尋</string>
+    <string name="action_search_hint">請輸入關鍵字</string>
+    <string name="title_main">戲劇列表</string>
+    <string name="info_drama_not_found">戲劇不存在</string>
+    <string name="info_drama_not_found_description">你在找的這部戲劇並不存在，請嘗試其它ID。</string>
+</resources>
