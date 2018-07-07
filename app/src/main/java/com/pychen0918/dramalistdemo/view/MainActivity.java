@@ -81,11 +81,12 @@ public class MainActivity extends AppCompatActivity {
         mSharedPreferences = getSharedPreferences("drama_list_demo_pref", MODE_PRIVATE);
 
         // Load query string from save instance for configuration change
-        if(savedInstanceState != null){
-            mSearchQuery = savedInstanceState.getString(TAG_SEARCH_QUERY);
-        }
-        else {
-            mSearchQuery = mSharedPreferences.getString("query", "");
+        if(mSearchQuery == null || mSearchQuery.isEmpty()) {
+            if (savedInstanceState != null) {
+                mSearchQuery = savedInstanceState.getString(TAG_SEARCH_QUERY);
+            } else {
+                mSearchQuery = mSharedPreferences.getString("query", "");
+            }
         }
     }
 
@@ -94,6 +95,12 @@ public class MainActivity extends AppCompatActivity {
         // Save query string into save instance for configuration change
         outState.putString(TAG_SEARCH_QUERY, mSearchView.getQuery().toString());
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mSearchQuery = mSearchView.getQuery().toString();
     }
 
     @Override
