@@ -6,4 +6,5 @@
     <color name="textPrimary">#212121</color>
     <color name="textSecondary">#757575</color>
     <color name="ratingStar">#F9A825</color>
+    <color name="grayBackground">#E0E0E0</color>
 </resources>
