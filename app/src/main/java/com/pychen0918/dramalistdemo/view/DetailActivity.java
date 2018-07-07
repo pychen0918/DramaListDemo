@@ -20,7 +20,6 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
 
         int id = -1;
         Bundle bundle = getIntent().getExtras();
@@ -38,14 +37,17 @@ public class DetailActivity extends AppCompatActivity {
         dramaDetailViewModel.getDrama(pathId, id).observe(this, new Observer<Drama>() {
             @Override
             public void onChanged(@Nullable Drama drama) {
-                // TODO: display loading screen and empty page
                 if(drama!=null){
+                    setContentView(R.layout.activity_detail);
                     Glide.with(DetailActivity.this).load(drama.getThumb()).into((ImageView) findViewById(R.id.img_preview));
                     ((TextView) findViewById(R.id.tv_name)).setText(drama.getName());
                     ((TextView) findViewById(R.id.tv_rating_text)).setText(drama.getDisplayRating());
                     ((RatingBar) findViewById(R.id.rating_bar)).setRating(drama.getRating());
                     ((TextView) findViewById(R.id.tv_total_view)).setText(drama.getDisplayTotalViews());
                     ((TextView) findViewById(R.id.tv_created_time)).setText(drama.getDisplayCreatedTime());
+                }
+                else{
+                    setContentView(R.layout.empty_page);
                 }
             }
         });

@@ -3,4 +3,6 @@
     <string name="action_search">Search</string>
     <string name="action_search_hint">Enter keywords</string>
     <string name="title_main">Drama List</string>
+    <string name="info_drama_not_found">Drama not exist</string>
+    <string name="info_drama_not_found_description">The drama you are looking for doesn\'t exist. Please try the other one.</string>
 </resources>
