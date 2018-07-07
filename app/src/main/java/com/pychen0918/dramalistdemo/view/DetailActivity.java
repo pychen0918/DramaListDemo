@@ -2,6 +2,7 @@ package com.pychen0918.dramalistdemo.view;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +24,11 @@ public class DetailActivity extends AppCompatActivity {
 
         int id = -1;
         Bundle bundle = getIntent().getExtras();
-        if(bundle!=null){
+        Uri deeplink = getIntent().getData();
+        if(deeplink!=null){
+            id = parseDeepLink(deeplink);
+        }
+        else if(bundle!=null){
             id = bundle.getInt("id");
         }
 
@@ -44,5 +49,14 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private int parseDeepLink(Uri deeplink) {
+        String path = deeplink.getPath();
+        int id = -1;
+        if(path.startsWith("/dramas")){
+            id = Integer.valueOf(deeplink.getLastPathSegment());
+        }
+        return id;
     }
 }
