@@ -28,12 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private final static String TAG_SEARCH_QUERY = "search_query";
     private DramaListRecyclerViewAdapter mDramaListRecyclerViewAdapter;
     private SearchView mSearchView;
     private MenuItem mSearchViewMenuItem;
-    private String mSearchQuery = "";
     private SharedPreferences mSharedPreferences;
+    private DramaListViewModel mDramaListViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,15 +47,20 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(R.string.title_main);
         }
 
+        // Initial shared preference
+        mSharedPreferences = getSharedPreferences("drama_list_demo_pref", MODE_PRIVATE);
+
         // Initial ViewModel, and start to observe drama list changes
         String pathId = this.getString(R.string.data_source_path);
-        DramaListViewModel dramaListViewModel = ViewModelProviders.of(this).get(DramaListViewModel.class);
-        dramaListViewModel.getDramaList(pathId).observe(this, new Observer<List<Drama>>() {
+        String queryString = mSharedPreferences.getString("query", "");
+        mDramaListViewModel = ViewModelProviders.of(this).get(DramaListViewModel.class);
+        mDramaListViewModel.setPathId(pathId);
+        mDramaListViewModel.setQueryString(queryString);
+        mDramaListViewModel.getFilteredDramaList().observe(this, new Observer<List<Drama>>() {
             @Override
             public void onChanged(@Nullable List<Drama> dramaData) {
                 if(dramaData != null && mDramaListRecyclerViewAdapter != null){
                     mDramaListRecyclerViewAdapter.update(dramaData);
-                    mDramaListRecyclerViewAdapter.getFilter().filter(mSearchQuery);
                 }
             }
         });
@@ -77,36 +81,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         dramaListRecyclerView.setAdapter(mDramaListRecyclerViewAdapter);
-
-        mSharedPreferences = getSharedPreferences("drama_list_demo_pref", MODE_PRIVATE);
-
-        // Load query string from save instance for configuration change
-        if(mSearchQuery == null || mSearchQuery.isEmpty()) {
-            if (savedInstanceState != null) {
-                mSearchQuery = savedInstanceState.getString(TAG_SEARCH_QUERY);
-            } else {
-                mSearchQuery = mSharedPreferences.getString("query", "");
-            }
-        }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // Save query string into save instance for configuration change
-        outState.putString(TAG_SEARCH_QUERY, mSearchView.getQuery().toString());
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mSearchQuery = mSearchView.getQuery().toString();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        mSharedPreferences.edit().putString("query", mSearchQuery).apply();
+        //mSharedPreferences.edit().putString("query", mSearchQuery).apply();
+        mSharedPreferences.edit().putString("query", mDramaListViewModel.getQueryString()).apply();
     }
 
     @Override
@@ -120,11 +101,12 @@ public class MainActivity extends AppCompatActivity {
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setMaxWidth(Integer.MAX_VALUE);
 
-        if(mSearchQuery != null && !mSearchQuery.isEmpty()){
+        // Set search view title
+        String queryString = mDramaListViewModel.getQueryString();
+        if(queryString != null && !queryString.isEmpty()){
             mSearchViewMenuItem.expandActionView();
-            mSearchView.setQuery(mSearchQuery, false);
+            mSearchView.setQuery(queryString, false);
             mSearchView.clearFocus();
-            mDramaListRecyclerViewAdapter.getFilter().filter(mSearchQuery);
         }
 
         // Search text changes
@@ -137,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String query) {
-                mDramaListRecyclerViewAdapter.getFilter().filter(query);
+                mDramaListViewModel.setQueryString(query);
                 return false;
             }
         });
