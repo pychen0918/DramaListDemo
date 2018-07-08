@@ -23,9 +23,17 @@
 ### 過濾戲劇名稱
 戲劇列表頁面的工具列有個搜尋按鈕，點選後可以輸入戲劇名稱進行過濾，列表將只顯示包含該名稱的戲劇資料。當使用者關閉 APP 後，輸入的關鍵字將被保留在 shared preference 裡面，下次開啟 APP 時會從此處讀取關鍵字並自動進行過濾，以保留上次搜尋結果。
 
+戲劇列表與關鍵字作為 LiveData，當資料更新後會在 view model 中處理，產生一個過濾後的新列表。此列表也是包覆在一個 LiveData 資料當中，一旦發生變化就會觸發 recyclerview adapter 與 UI 的更新。
+
 ### 透過網址開啟 APP
 戲劇資訊頁面實作 deep link 功能，讓使用者可以透過特定網址開啟 APP 並顯示戲劇資訊。此一特定網址為
 ```
 http://www.example.com/dramas/:id
 ```
 此處的 :id 為某一特定戲劇的 id。例如使用 http://www.example.com/dramas/1 網址，即可開啟 APP 並顯示 id 為 1 的戲劇之資訊。
+
+## 使用架構與套件
+* 採用 MVVM 架構，使用 Android Architecture Components 中的 LiveData, ViewModel 與 Room
+* 使用 Retrofit 下載資料，透過 gson 處理 json 格式文件
+* 使用 Glide 下載及暫存圖片
+* 使用 Android Data Binding Library
