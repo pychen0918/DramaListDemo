@@ -27,8 +27,11 @@ public class DramaListViewModel extends AndroidViewModel {
 
     public DramaListViewModel(@NonNull Application application) {
         super(application);
+
+        // Initial data repository
         mDataRepository = DataRepository.getInstance(AppDatabase.getInstance(application), application.getResources().getString(R.string.data_source_url));
 
+        // Initial live data
         mPathId = new MutableLiveData<>();
         final LiveData<List<Drama>> mDramaList = Transformations.switchMap(mPathId, new Function<String, LiveData<List<Drama>>>() {
             @Override
@@ -40,6 +43,11 @@ public class DramaListViewModel extends AndroidViewModel {
                 return mDataRepository.getDramaList(pathId);
             }
         });
+
+        /*
+         * mFilteredDramaList observes two live data: query string and the raw drama list
+         * It needs to update itself when either one of this changed
+         */
         mQuery = new MutableLiveData<>();
         mFilteredDramaList = new MediatorLiveData<>();
         mFilteredDramaList.addSource(mQuery, new Observer<String>() {

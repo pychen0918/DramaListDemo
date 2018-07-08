@@ -42,7 +42,16 @@ public class DataRepository {
         mDramaWebApi = retrofit.create(DramaWebApi.class);
     }
 
+    /**
+     * Get data repository instance. Always use this instead of constructor (singleton)
+     * @param appDatabase the database instance
+     * @param baseUrl url to data source on the web
+     * @return instance of the data repository
+     */
     public static DataRepository getInstance(final AppDatabase appDatabase, final String baseUrl){
+        /*
+        * Singleton pattern
+        */
         if(sInstance == null){
             synchronized (DataRepository.class){
                 if(sInstance == null){
@@ -89,7 +98,19 @@ public class DataRepository {
         return mDramaDao.getAll();
     }
 
+    /**
+     * Get single drama by Id from either web or database
+     * @param pathId the path string in the url
+     * @param id the drama id
+     * @return LiveData of the drama
+     */
     public LiveData<Drama> getDrama(final String pathId, final Integer id) {
+        /*
+         * By now, we always update the database with the information received from the internet
+         * 1. Return drama data in DB
+         * 2. Update DB with the data from internet
+         * 3. UI will receive the event once DB is updated
+         */
         mDramaWebApi.getDramaList(pathId).enqueue(new Callback<DramaDataContainer>() {
             @Override
             public void onResponse(@NonNull Call<DramaDataContainer> call, @NonNull Response<DramaDataContainer> response) {
@@ -114,6 +135,10 @@ public class DataRepository {
         return mDramaDao.get(id);
     }
 
+    /**
+     * Insert drama list into database
+     * @param dramaList the list of dramas
+     */
     private void insertDramaData(final List<Drama> dramaList){
         mExecutor.execute(new Runnable() {
             @Override

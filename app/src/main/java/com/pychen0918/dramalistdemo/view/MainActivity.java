@@ -140,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        // Collapse searchview if it is expanded
         if(mSearchView!=null && !mSearchView.isIconified()){
             if(mSearchViewMenuItem!=null)
                 mSearchViewMenuItem.collapseActionView();
