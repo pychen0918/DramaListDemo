@@ -1,5 +1,6 @@
 package com.pychen0918.dramalistdemo.view.adapter;
 
+import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,11 +9,9 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
-import android.widget.RatingBar;
-import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.pychen0918.dramalistdemo.R;
+import com.pychen0918.dramalistdemo.databinding.ItemDramaBinding;
 import com.pychen0918.dramalistdemo.model.data.Drama;
 
 import java.util.ArrayList;
@@ -32,7 +31,10 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_drama, parent, false));
+        LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+        ItemDramaBinding binding = DataBindingUtil.inflate(layoutInflater, R.layout.item_drama, parent, false);
+
+        return new ViewHolder(binding);
     }
 
     @Override
@@ -43,12 +45,7 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
                 holder.itemView.setOnClickListener(mOnClickListener);
             }
             holder.itemView.setTag(item.getDramaId());
-
-            Glide.with(holder.itemView.getContext()).load(item.getThumb()).into(holder.thumb);
-            holder.name.setText(item.getName());
-            holder.ratingText.setText(item.getDisplayRating());
-            holder.ratingBar.setRating(item.getRating());
-            holder.createdTime.setText(item.getDisplayCreatedTime());
+            holder.bind(item);
         }
     }
 
@@ -100,19 +97,18 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+        private final ItemDramaBinding binding;
         private ImageView thumb;
-        private TextView name;
-        private TextView ratingText;
-        private RatingBar ratingBar;
-        private TextView createdTime;
 
-        ViewHolder(View itemView) {
-            super(itemView);
-            this.thumb = itemView.findViewById(R.id.img_thumbnail);
-            this.name = itemView.findViewById(R.id.tv_name);
-            this.ratingText = itemView.findViewById(R.id.tv_rating_text);
-            this.ratingBar = itemView.findViewById(R.id.rating_bar);
-            this.createdTime = itemView.findViewById(R.id.tv_created_time);
+        ViewHolder(ItemDramaBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
+            this.thumb = binding.getRoot().findViewById(R.id.img_thumbnail);
+        }
+
+        void bind(Drama data){
+            binding.setDrama(data);
+            binding.executePendingBindings();
         }
     }
 }
