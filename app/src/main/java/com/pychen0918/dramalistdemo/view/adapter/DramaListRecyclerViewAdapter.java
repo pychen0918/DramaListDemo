@@ -2,6 +2,7 @@ package com.pychen0918.dramalistdemo.view.adapter;
 
 import android.databinding.DataBindingUtil;
 import android.support.annotation.NonNull;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,9 +49,9 @@ public class DramaListRecyclerViewAdapter extends RecyclerView.Adapter<DramaList
     }
 
     public void update(List<Drama> dramaList) {
-        // TODO: rewrite with DiffUtil
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DramaDiffCallback(dramaList, this.mDramaList));
+        diffResult.dispatchUpdatesTo(this);
         this.mDramaList = dramaList;
-        notifyDataSetChanged();
     }
 
     public void setOnClickListener(View.OnClickListener listener){
